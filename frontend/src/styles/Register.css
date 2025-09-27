@@ -1,0 +1,150 @@
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f3f4f6; /* gray-50 */
+  padding: 2rem;
+}
+
+.register-card {
+  background: #fff;
+  width: 100%;
+  max-width: 700px;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.register-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827; /* gray-900 */
+}
+
+.register-header p {
+  color: #6b7280; /* gray-500 */
+  margin-top: 0.5rem;
+}
+
+.register-form label {
+  display: block;
+  font-weight: 500;
+  color: #374151; /* gray-700 */
+  margin-bottom: 0.5rem;
+}
+
+.register-form input,
+.register-form select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: #111827;
+  outline: none;
+  transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.register-form input:focus,
+.register-form select:focus {
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.role-selection {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.role-option {
+  flex: 1;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.role-option.selected {
+  border-color: #3b82f6;
+  background: #ebf4ff;
+}
+
+.role-option .icon {
+  font-size: 1.25rem;
+  color: #9ca3af;
+}
+
+.role-option.selected .icon {
+  color: #3b82f6;
+}
+
+.submit-btn {
+  width: 100%;
+  background: #3b82f6;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background: #2563eb;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #9ca3af;
+}
+
+.terms {
+  display: flex;
+  align-items: center; /* vertical alignment */
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.terms input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  vertical-align: middle;
+}
+
+.terms label {
+  display: inline-flex; /* ensures checkbox and text stay on the same line */
+  align-items: center;  /* vertical alignment of text with checkbox */
+  gap: 0.25rem;         /* spacing between checkbox and text */
+}
+
+.terms a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.terms a:hover {
+  text-decoration: underline;
+}

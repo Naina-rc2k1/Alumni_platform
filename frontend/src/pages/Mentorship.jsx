@@ -8,12 +8,10 @@ import {
   Clock, 
   MapPin, 
   Plus,
-  Edit,
   Trash2,
   CheckCircle,
-  XCircle,
-  Star,
-  MessageCircle
+  MessageCircle,
+  Star
 } from 'lucide-react';
 import Card from '../components/Card';
 
@@ -21,7 +19,6 @@ const Mentorship = () => {
   const [mentorships, setMentorships] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingMentorship, setEditingMentorship] = useState(null);
   const [filter, setFilter] = useState('all'); // all, available, my-mentorships, applications
   
   const { user, isAdmin, isAlumni, isStudent } = useAuth();
@@ -80,7 +77,7 @@ const Mentorship = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-blue-600"></div>
       </div>
     );
   }
@@ -88,174 +85,149 @@ const Mentorship = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Mentorship Program</h1>
-          <p className="text-gray-600">
-            Connect with experienced alumni for guidance and career development
-          </p>
+          <p className="text-gray-600">Connect with experienced alumni for guidance and career development</p>
         </div>
 
-        {/* Filters and Actions */}
-        <Card className="mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex space-x-2">
+        {/* Filters & Actions */}
+        <Card className="mb-8 p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setFilter('all')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              All Opportunities
+            </button>
+            <button
+              onClick={() => setFilter('available')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                filter === 'available' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              Available
+            </button>
+            {isAlumni && (
               <button
-                onClick={() => setFilter('all')}
+                onClick={() => setFilter('my-mentorships')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === 'all' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  filter === 'my-mentorships' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                All Opportunities
+                My Mentorships
               </button>
+            )}
+            {isStudent && (
               <button
-                onClick={() => setFilter('available')}
+                onClick={() => setFilter('applications')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === 'available' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  filter === 'applications' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                Available
-              </button>
-              {isAlumni && (
-                <button
-                  onClick={() => setFilter('my-mentorships')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    filter === 'my-mentorships' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  My Mentorships
-                </button>
-              )}
-              {isStudent && (
-                <button
-                  onClick={() => setFilter('applications')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    filter === 'applications' 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  My Applications
-                </button>
-              )}
-            </div>
-            
-            {(isAlumni || isAdmin) && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="btn btn-primary"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create Mentorship
+                My Applications
               </button>
             )}
           </div>
+
+          {(isAlumni || isAdmin) && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="btn btn-primary flex items-center"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Create Mentorship
+            </button>
+          )}
         </Card>
 
         {/* Mentorship Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMentorships.map((mentorship) => (
-            <Card key={mentorship._id} className="hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                    <GraduationCap className="h-6 w-6 text-purple-600" />
+            <Card key={mentorship._id} className="hover:shadow-lg transition-shadow p-4 flex flex-col justify-between">
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                      <GraduationCap className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">{mentorship.title}</h3>
+                      <p className="text-sm text-gray-500">{mentorship.mentor.name}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{mentorship.title}</h3>
-                    <p className="text-sm text-gray-500">{mentorship.mentor.name}</p>
+
+                  {(isAdmin || mentorship.mentor._id === user?._id) && (
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleDelete(mentorship._id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2 mb-4 text-sm text-gray-600">
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 mr-2" />
+                    {mentorship.duration} months
+                  </div>
+                  <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-2" />
+                    {mentorship.maxMentees} mentees max
+                  </div>
+                  {mentorship.location && (
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      {mentorship.location}
+                    </div>
+                  )}
+                  <div className="flex items-center">
+                    <Star className="h-4 w-4 mr-2" />
+                    {mentorship.applications?.length || 0} applications
                   </div>
                 </div>
-                
-                {(isAdmin || mentorship.mentor._id === user?._id) && (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setEditingMentorship(mentorship)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(mentorship._id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
+
+                <div className="mb-4">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    mentorship.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    {mentorship.status}
+                  </span>
+                </div>
+
+                {mentorship.description && (
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-3">{mentorship.description}</p>
                 )}
               </div>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Clock className="h-4 w-4 mr-2" />
-                  {mentorship.duration} months
-                </div>
-                
-                <div className="flex items-center text-sm text-gray-600">
-                  <Users className="h-4 w-4 mr-2" />
-                  {mentorship.maxMentees} mentees max
-                </div>
-                
-                {mentorship.location && (
-                  <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    {mentorship.location}
-                  </div>
-                )}
-                
-                <div className="flex items-center text-sm text-gray-600">
-                  <Star className="h-4 w-4 mr-2" />
-                  {mentorship.applications?.length || 0} applications
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                  mentorship.status === 'open' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {mentorship.status}
-                </span>
-              </div>
-
-              {mentorship.description && (
-                <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                  {mentorship.description}
-                </p>
-              )}
-
-              <div className="pt-4 border-t">
+              <div className="pt-2 border-t flex flex-col gap-2">
                 {isStudent && mentorship.status === 'open' && mentorship.mentor._id !== user?._id && (
                   <button
                     onClick={() => handleApply(mentorship._id)}
-                    className="w-full btn btn-primary text-sm py-2"
+                    className="w-full btn btn-primary flex items-center justify-center text-sm py-2"
                   >
                     <CheckCircle className="h-4 w-4 mr-1" />
                     Apply Now
                   </button>
                 )}
-                
+
                 {mentorship.mentor._id === user?._id && (
                   <button
-                    onClick={() => {/* Navigate to applications */}}
-                    className="w-full btn btn-outline text-sm py-2"
+                    className="w-full btn btn-outline flex items-center justify-center text-sm py-2"
                   >
                     <MessageCircle className="h-4 w-4 mr-1" />
                     View Applications
                   </button>
                 )}
-                
+
                 {isStudent && mentorship.applications?.some(app => app.student._id === user?._id) && (
-                  <div className="text-center text-sm text-gray-600">
-                    Application Submitted
-                  </div>
+                  <div className="text-center text-sm text-gray-600">Application Submitted</div>
                 )}
               </div>
             </Card>
