@@ -4,7 +4,6 @@ import { alumniApi } from '../api/alumniApi';
 import { toast } from 'react-toastify';
 import { 
   Search, 
-  Filter, 
   MapPin, 
   Calendar, 
   Briefcase, 
@@ -13,7 +12,6 @@ import {
   Mail,
   Phone,
   Plus,
-  Edit,
   Trash2
 } from 'lucide-react';
 import Card from '../components/Card';
@@ -28,9 +26,8 @@ const AlumniDirectory = () => {
     location: ''
   });
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingAlumni, setEditingAlumni] = useState(null);
   
-  const { user, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     fetchAlumni();
@@ -188,12 +185,6 @@ const AlumniDirectory = () => {
                 
                 {isAdmin && (
                   <div className="flex space-x-2">
-                    <button
-                      onClick={() => setEditingAlumni(alumnus)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
                     <button
                       onClick={() => handleDelete(alumnus._id)}
                       className="text-red-600 hover:text-red-800"
