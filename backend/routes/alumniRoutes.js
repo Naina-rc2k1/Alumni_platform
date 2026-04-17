@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
 const User = require('../models/User');
-const { authMiddleware, adminMiddleware } = require('../middleware/authMiddleware');
+const { authMiddleware, adminMiddleware, authorizeRoles } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -10,6 +10,7 @@ const router = express.Router();
 // @access  Private
 router.get('/', [
   authMiddleware,
+  authorizeRoles('alumni'),
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('graduationYear').optional().isInt({ min: 1950, max: new Date().getFullYear() }).withMessage('Invalid graduation year'),
@@ -32,7 +33,7 @@ router.get('/', [
     const skip = (page - 1) * limit;
 
     // Build filter object
-    const filter = { role: 'alumni', isActive: true };
+    const filter = { role: 'alumni', isActive: true, isVerified: true };
     
     if (req.query.graduationYear) {
       filter.graduationYear = req.query.graduationYear;
@@ -88,6 +89,7 @@ router.get('/', [
 // @access  Private
 router.get('/search', [
   authMiddleware,
+  authorizeRoles('alumni'),
   query('q').notEmpty().withMessage('Search query is required')
 ], async (req, res) => {
   try {
@@ -106,6 +108,7 @@ router.get('/search', [
     const alumni = await User.find({
       role: 'alumni',
       isActive: true,
+      isVerified: true,
       $or: [
         { name: searchRegex },
         { email: searchRegex },
@@ -135,12 +138,13 @@ router.get('/search', [
 // @desc    Get single alumni
 // @route   GET /api/alumni/:id
 // @access  Private
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', [authMiddleware, authorizeRoles('alumni')], async (req, res) => {
   try {
     const alumni = await User.findOne({
       _id: req.params.id,
       role: 'alumni',
-      isActive: true
+      isActive: true,
+      isVerified: true,
     }).select('-password -resetPasswordToken -resetPasswordExpires -verificationToken');
 
     if (!alumni) {

@@ -32,7 +32,10 @@ const Login = () => {
       const result = await login(formData.email, formData.password, formData.role);
       if (result.success) {
         toast.success('Login successful!');
-        navigate('/');
+        const role = result.role;
+        if (role === 'admin') navigate('/admin-dashboard');
+        else if (role === 'alumni') navigate('/alumni-dashboard');
+        else navigate('/student-dashboard');
       } else {
         toast.error(result.error);
       }
@@ -51,7 +54,7 @@ const Login = () => {
       description: 'Graduated students'
     },
     {
-      value: 'student',
+      value: 'currentStudent',
       label: 'Current Student',
       icon: <Users className="h-5 w-5" />,
       description: 'Currently enrolled'
@@ -139,7 +142,9 @@ const Login = () => {
             <label className="remember-me">
               <input type="checkbox" /> Remember me
             </label>
-            <a href="#" className="forgot-link">Forgot password?</a>
+            <button type="button" className="forgot-link">
+              Forgot password?
+            </button>
           </div>
 
           {/* Submit */}

@@ -18,7 +18,6 @@ import Card from '../components/Card';
 const Mentorship = () => {
   const [mentorships, setMentorships] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
   const [filter, setFilter] = useState('all'); // all, available, my-mentorships, applications
   
   const { user, isAdmin, isAlumni, isStudent } = useAuth();
@@ -135,7 +134,7 @@ const Mentorship = () => {
 
           {(isAlumni || isAdmin) && (
             <button
-              onClick={() => setShowAddModal(true)}
+              onClick={() => toast.info('Mentorship creation UI is not implemented yet')}
               className="btn btn-primary flex items-center"
             >
               <Plus className="h-4 w-4 mr-1" />

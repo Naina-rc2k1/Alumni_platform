@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-import { Eye, EyeOff, User, Lock, Mail, Phone, MapPin, Calendar, GraduationCap, Users, Shield, Building, Briefcase } from 'lucide-react';
+import { Eye, EyeOff, GraduationCap, Users, Shield } from 'lucide-react';
 import '../styles/Register.css';
 
 const Register = () => {
@@ -41,7 +41,10 @@ const Register = () => {
       const result = await register(formData);
       if (result.success) {
         toast.success('Registration successful!');
-        navigate('/');
+        const role = result.role;
+        if (role === 'admin') navigate('/admin-dashboard');
+        else if (role === 'alumni') navigate('/alumni-dashboard');
+        else navigate('/student-dashboard');
       } else toast.error(result.error);
     } catch {
       toast.error('An unexpected error occurred');
@@ -52,7 +55,7 @@ const Register = () => {
 
   const roleOptions = [
     { value: 'alumni', label: 'Alumni', icon: <GraduationCap />, description: 'Graduated students' },
-    { value: 'student', label: 'Current Student', icon: <Users />, description: 'Currently enrolled' },
+    { value: 'currentStudent', label: 'Current Student', icon: <Users />, description: 'Currently enrolled' },
     { value: 'admin', label: 'Administrator', icon: <Shield />, description: 'Platform administrator' }
   ];
 
@@ -109,7 +112,7 @@ const Register = () => {
           )}
 
           {/* Student fields */}
-          {formData.role === 'student' && (
+          {(formData.role === 'currentStudent' || formData.role === 'student') && (
             <>
               <label>Student ID</label>
               <input type="text" name="studentId" value={formData.studentId} onChange={handleChange} placeholder="Enter your student ID" />
@@ -138,7 +141,7 @@ const Register = () => {
 <div className="terms">
   <label htmlFor="terms">
     <input type="checkbox" id="terms" name="terms" required />
-    I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a>
+    I agree to the <span>Terms and Conditions</span> and <span>Privacy Policy</span>
   </label>
 </div>
 

@@ -145,4 +145,19 @@ export const mentorshipApi = {
     api.put(`/mentorship/${mentorshipId}/applications/${applicationId}/reject`),
 };
 
+export const adminApi = {
+  getUsers: (params = {}) =>
+    api.get('/admin/users', { params }),
+
+  deleteUser: (userId) =>
+    api.delete(`/admin/users/${userId}`),
+
+  verifyAlumni: (alumniId, verified = true) =>
+    api.patch(`/admin/alumni/${alumniId}/verify`, { verified }),
+};
+
+export const studentDashboardApi = {
+  getMe: () => api.get('/student'),
+};
+
 export default api;

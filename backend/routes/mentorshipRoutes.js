@@ -289,10 +289,11 @@ router.post('/:id/apply', [
       });
     }
 
-    if (req.user.role !== 'student') {
+    const userRole = req.user.role === 'student' ? 'currentStudent' : req.user.role;
+    if (userRole !== 'currentStudent') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can apply for mentorship'
+        message: 'Only current students can apply for mentorship'
       });
     }
 

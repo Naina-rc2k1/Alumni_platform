@@ -1,14 +1,26 @@
+
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { authMiddleware } = require('../middleware/authMiddleware');
 
+
+const { login } = require('../controllers/authController');
+
 const router = express.Router();
 
+const normalizeRole = (role) => {
+  if (role === 'student') return 'currentStudent';
+  return role;
+};
+
 // Generate JWT Token
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET || 'your-secret-key', {
+const generateToken = (user) => {
+  return jwt.sign({ 
+    id: user._id, 
+    role: normalizeRole(user.role) 
+  }, process.env.JWT_SECRET || 'your-secret-key', {
     expiresIn: process.env.JWT_EXPIRE || '30d'
   });
 };
@@ -20,7 +32,7 @@ router.post('/register', [
   body('name').trim().isLength({ min: 2, max: 100 }).withMessage('Name must be between 2 and 100 characters'),
   body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('role').isIn(['admin', 'student', 'alumni']).withMessage('Role must be admin, student, or alumni')
+  body('role').isIn(['admin', 'student', 'currentStudent', 'alumni']).withMessage('Role must be admin, currentStudent/student, or alumni')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -33,6 +45,7 @@ router.post('/register', [
     }
 
     const { name, email, password, role, phone, location, graduationYear, fieldOfStudy, currentPosition, company, studentId, department } = req.body;
+    const storedRole = normalizeRole(role);
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -48,18 +61,18 @@ router.post('/register', [
       name,
       email,
       password,
-      role,
+      role: storedRole,
       phone,
       location
     };
 
     // Add role-specific fields
-    if (role === 'alumni') {
+    if (storedRole === 'alumni') {
       userData.graduationYear = graduationYear;
       userData.fieldOfStudy = fieldOfStudy;
       userData.currentPosition = currentPosition;
       userData.company = company;
-    } else if (role === 'student') {
+    } else if (storedRole === 'currentStudent') {
       userData.studentId = studentId;
       userData.department = department;
     }
@@ -67,7 +80,8 @@ router.post('/register', [
     const user = await User.create(userData);
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
+    const responseRole = normalizeRole(user.role);
 
     // Update last login
     user.lastLogin = new Date();
@@ -77,6 +91,7 @@ router.post('/register', [
       success: true,
       message: 'User registered successfully',
       token,
+      role: responseRole,
       user: user.getPublicProfile()
     });
   } catch (error) {
@@ -94,7 +109,7 @@ router.post('/register', [
 router.post('/login', [
   body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
   body('password').notEmpty().withMessage('Password is required'),
-  body('role').isIn(['admin', 'student', 'alumni']).withMessage('Role must be admin, student, or alumni')
+  body('role').isIn(['admin', 'student', 'currentStudent', 'alumni']).withMessage('Role must be admin, currentStudent/student, or alumni')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -107,9 +122,14 @@ router.post('/login', [
     }
 
     const { email, password, role } = req.body;
+    const incomingRole = normalizeRole(role);
+
+    const roleCandidates = incomingRole === 'currentStudent'
+      ? ['currentStudent', 'student']
+      : [incomingRole];
 
     // Find user by email and role
-    const user = await User.findOne({ email, role });
+    const user = await User.findOne({ email, role: { $in: roleCandidates } });
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -135,7 +155,8 @@ router.post('/login', [
     }
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
+    const responseRole = normalizeRole(user.role);
 
     // Update last login
     user.lastLogin = new Date();
@@ -145,6 +166,7 @@ router.post('/login', [
       success: true,
       message: 'Login successful',
       token,
+      role: responseRole,
       user: user.getPublicProfile()
     });
   } catch (error) {
@@ -379,5 +401,8 @@ router.post('/reset-password', [
     });
   }
 });
+
+// 👇 login route
+router.post('/login', login);
 
 module.exports = router;

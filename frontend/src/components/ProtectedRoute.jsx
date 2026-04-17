@@ -5,6 +5,11 @@ import { useAuth } from '../context/AuthContext';
 const ProtectedRoute = ({ children, requiredRole = null }) => {
   const { isAuthenticated, user, loading } = useAuth();
 
+  const normalizeRole = (role) => {
+    if (role === 'student') return 'currentStudent';
+    return role;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -17,8 +22,9 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/" replace />;
+  if (requiredRole) {
+    const userRole = normalizeRole(user?.role);
+    if (userRole !== requiredRole) return <Navigate to="/login" replace />;
   }
 
   return children;

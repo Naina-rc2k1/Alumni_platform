@@ -17,6 +17,9 @@ import Register from './pages/Register';
 import AlumniDirectory from './pages/AlumniDirectory';
 import Events from './pages/Events';
 import Mentorship from './pages/Mentorship';
+import AdminDashboard from './pages/AdminDashboard';
+import AlumniDashboard from './pages/AlumniDashboard';
+import StudentDashboard from './pages/StudentDashboard';
 
 // Protected Route Component
 import ProtectedRoute from './components/ProtectedRoute';
@@ -35,10 +38,34 @@ function App() {
               <Route 
                 path="/alumni" 
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiredRole="alumni">
                     <AlumniDirectory />
                   </ProtectedRoute>
                 } 
+              />
+              <Route
+                path="/admin-dashboard"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/alumni-dashboard"
+                element={
+                  <ProtectedRoute requiredRole="alumni">
+                    <AlumniDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/student-dashboard"
+                element={
+                  <ProtectedRoute requiredRole="currentStudent">
+                    <StudentDashboard />
+                  </ProtectedRoute>
+                }
               />
               <Route 
                 path="/events" 

@@ -31,7 +31,7 @@ router.get('/', [
     const skip = (page - 1) * limit;
 
     // Build filter object
-    const filter = { role: 'student', isActive: true };
+    const filter = { role: { $in: ['currentStudent', 'student'] }, isActive: true };
     
     if (req.query.department) {
       filter.department = { $regex: req.query.department, $options: 'i' };
@@ -80,7 +80,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
   try {
     const student = await User.findOne({
       _id: req.params.id,
-      role: 'student',
+      role: { $in: ['currentStudent', 'student'] },
       isActive: true
     }).select('-password -resetPasswordToken -resetPasswordExpires -verificationToken');
 
@@ -160,7 +160,7 @@ router.post('/', [
       name,
       email,
       password,
-      role: 'student',
+      role: 'currentStudent',
       studentId,
       department,
       phone,
@@ -305,16 +305,16 @@ router.get('/stats/overview', [
   adminMiddleware
 ], async (req, res) => {
   try {
-    const totalStudents = await User.countDocuments({ role: 'student', isActive: true });
+    const totalStudents = await User.countDocuments({ role: { $in: ['currentStudent', 'student'] }, isActive: true });
     const recentStudents = await User.countDocuments({ 
-      role: 'student', 
+      role: { $in: ['currentStudent', 'student'] }, 
       isActive: true,
       createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } // Last 30 days
     });
 
     // Get department distribution
     const departments = await User.aggregate([
-      { $match: { role: 'student', isActive: true, department: { $exists: true, $ne: '' } } },
+      { $match: { role: { $in: ['currentStudent', 'student'] }, isActive: true, department: { $exists: true, $ne: '' } } },
       { $group: { _id: '$department', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 10 }

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -22,7 +22,12 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'student', 'alumni'],
+    // Canonical role names:
+    // - currentStudent (required by prompt)
+    // - alumni
+    // - admin
+    // Backwards compatibility: existing data may still store "student".
+    enum: ['admin', 'alumni', 'currentStudent', 'student'],
     required: [true, 'Role is required'],
     default: 'alumni'
   },

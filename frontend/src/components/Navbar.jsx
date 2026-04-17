@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X, User, LogOut, Settings, Users, Calendar, GraduationCap } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings, GraduationCap } from 'lucide-react';
 import '../styles/Navbar.css';
 
 const Navbar = () => {
@@ -10,6 +10,10 @@ const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const normalizeRole = (role) => {
+    if (role === 'student') return 'currentStudent';
+    return role;
+  };
 
   const handleLogout = () => {
     logout();
@@ -35,7 +39,15 @@ const Navbar = () => {
         <div className="nav-links-desktop">
           {isAuthenticated && (
             <>
-              <Link to="/alumni" className="nav-link">Alumni Directory</Link>
+              {user?.role === 'alumni' && (
+                <Link to="/alumni" className="nav-link">Alumni Directory</Link>
+              )}
+              {normalizeRole(user?.role) === 'currentStudent' && (
+                <Link to="/student-dashboard" className="nav-link">Student Dashboard</Link>
+              )}
+              {user?.role === 'admin' && (
+                <Link to="/admin-dashboard" className="nav-link">Admin Dashboard</Link>
+              )}
               <Link to="/events" className="nav-link">Events</Link>
               <Link to="/mentorship" className="nav-link">Mentorship</Link>
             </>
@@ -85,7 +97,15 @@ const Navbar = () => {
           <Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
           {isAuthenticated && (
             <>
-              <Link to="/alumni" onClick={() => setIsMenuOpen(false)}>Alumni Directory</Link>
+                {user?.role === 'alumni' && (
+                  <Link to="/alumni" onClick={() => setIsMenuOpen(false)}>Alumni Directory</Link>
+                )}
+                {normalizeRole(user?.role) === 'currentStudent' && (
+                  <Link to="/student-dashboard" onClick={() => setIsMenuOpen(false)}>Student Dashboard</Link>
+                )}
+                {user?.role === 'admin' && (
+                  <Link to="/admin-dashboard" onClick={() => setIsMenuOpen(false)}>Admin Dashboard</Link>
+                )}
               <Link to="/events" onClick={() => setIsMenuOpen(false)}>Events</Link>
               <Link to="/mentorship" onClick={() => setIsMenuOpen(false)}>Mentorship</Link>
             </>

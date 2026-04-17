@@ -3,6 +3,11 @@ import { authApi } from '../api/authApi';
 
 const AuthContext = createContext();
 
+const normalizeRole = (role) => {
+  if (role === 'student') return 'currentStudent';
+  return role;
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -20,8 +25,8 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       if (token) {
         try {
-          const userData = await authApi.getProfile();
-          setUser(userData);
+          const response = await authApi.getProfile();
+          setUser(response?.data?.user || null);
         } catch (error) {
           console.error('Failed to get user profile:', error);
           localStorage.removeItem('token');
@@ -37,13 +42,13 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password, role) => {
     try {
       const response = await authApi.login(email, password, role);
-      const { token: newToken, user: userData } = response;
+      const { token: newToken, user: userData, role: responseRole } = response.data || {};
       
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(userData);
       
-      return { success: true };
+      return { success: true, role: normalizeRole(responseRole) };
     } catch (error) {
       return { 
         success: false, 
@@ -55,13 +60,13 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await authApi.register(userData);
-      const { token: newToken, user: newUser } = response;
+      const { token: newToken, user: newUser, role: responseRole } = response.data || {};
       
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(newUser);
       
-      return { success: true };
+      return { success: true, role: normalizeRole(responseRole) };
     } catch (error) {
       return { 
         success: false, 
@@ -78,8 +83,8 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (profileData) => {
     try {
-      const updatedUser = await authApi.updateProfile(profileData);
-      setUser(updatedUser);
+      const response = await authApi.updateProfile(profileData);
+      setUser(response?.data?.user || null);
       return { success: true };
     } catch (error) {
       return { 
@@ -99,7 +104,7 @@ export const AuthProvider = ({ children }) => {
     updateProfile,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
-    isStudent: user?.role === 'student',
+    isStudent: normalizeRole(user?.role) === 'currentStudent',
     isAlumni: user?.role === 'alumni'
   };
 

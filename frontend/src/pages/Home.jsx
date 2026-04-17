@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 const Home = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const features = [
     { icon: <Users className="icon" />, title: "Alumni Directory", description: "Connect with fellow alumni, search by graduation year, field of study, or location." },
@@ -58,7 +58,16 @@ const Home = () => {
                 </Link>
               </>
             ) : (
-              <Link to="/alumni" className="btn btn-primary">
+              <Link
+                to={
+                  user?.role === 'admin'
+                    ? '/admin-dashboard'
+                    : user?.role === 'alumni'
+                      ? '/alumni-dashboard'
+                      : '/student-dashboard'
+                }
+                className="btn btn-primary"
+              >
                 Explore Platform <ArrowRight className="icon-small" />
               </Link>
             )}

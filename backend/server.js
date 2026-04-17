@@ -10,6 +10,8 @@ dotenv.config();
 const authRoutes = require('./routes/authRoutes');
 const alumniRoutes = require('./routes/alumniRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const studentDashboardRoutes = require('./routes/studentDashboardRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const mentorshipRoutes = require('./routes/mentorshipRoutes');
 
@@ -39,6 +41,8 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/alumni_pl
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/alumni', alumniRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/student', studentDashboardRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/mentorship', mentorshipRoutes);
